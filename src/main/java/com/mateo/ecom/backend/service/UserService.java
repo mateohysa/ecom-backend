@@ -1,5 +1,6 @@
 package com.mateo.ecom.backend.service;
 
+import com.mateo.ecom.backend.api.exceptions.UserAlreadyExists;
 import com.mateo.ecom.backend.api.model.RegistrationBody;
 import com.mateo.ecom.backend.models.AppUser;
 import com.mateo.ecom.backend.models.dao.UserRepository;
@@ -14,8 +15,11 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public AppUser user(RegistrationBody registrationBody) {
+    public AppUser user(RegistrationBody registrationBody) throws UserAlreadyExists {
 
+        if (userRepository.findByUsernameLikeIgnoreCase(registrationBody.getUsername()).isPresent() || userRepository.findByEmailIgnoreCase(registrationBody.getEmail()).isPresent()) {
+            throw new UserAlreadyExists();
+        }
         AppUser user = new AppUser();
         user.setFirstName(registrationBody.getFirstName());
         user.setLastName(registrationBody.getLastName());
