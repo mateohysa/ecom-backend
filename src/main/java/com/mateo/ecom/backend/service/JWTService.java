@@ -36,4 +36,12 @@ public class JWTService {
                 .withIssuer(issuer)
                 .sign(algorithm);
     }
+
+    //since we used .withclaim username_key in the method above
+    //we can also use the same in this method below to find who is
+    //sending requests to our api just by the JWT token
+
+    public String findUsername(String token) {
+        return JWT.decode(token).getClaim(USERNAME_KEY).asString();
+    }
 }
