@@ -1,5 +1,6 @@
 package com.mateo.ecom.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ public class AppUser {
     @Column(name = "email", nullable = false, unique = true, length = 320)
     private String email;
 
+    @JsonIgnore
     @Column(name = "password", nullable = false, length = 1000)
     private String password;
 
@@ -29,6 +31,7 @@ public class AppUser {
     @Column(name = "id", unique = true)
     private Long id;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Address> addresses = new ArrayList<>();
 
