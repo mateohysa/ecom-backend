@@ -1,5 +1,6 @@
 package com.mateo.ecom.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -17,6 +18,7 @@ public class AppOrderQuantities {
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
+    @JsonIgnore
     @ManyToOne(optional = false)
     @JoinColumn(name = "order_id", nullable = false)
     private AppOrder order;
