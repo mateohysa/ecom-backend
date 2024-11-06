@@ -1,5 +1,6 @@
 package com.mateo.ecom.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -26,6 +27,7 @@ public class Address {
   @Column(name = "post_code", nullable = false)
   private String postCode;
 
+  @JsonIgnore
   @ManyToOne(optional = false)
   @JoinColumn(name = "user_id", nullable = false)
   private AppUser user;
