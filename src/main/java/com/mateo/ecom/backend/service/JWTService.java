@@ -23,6 +23,8 @@ public class JWTService {
     private Algorithm algorithm;
 
     public static final String USERNAME_KEY = "USERNAME";
+    public static final String EMAIL_KEY = "EMAIL";
+
 
     @PostConstruct
     public void init() {
@@ -37,9 +39,13 @@ public class JWTService {
                 .sign(algorithm);
     }
 
-    //since we used .withclaim username_key in the method above
-    //we can also use the same in this method below to find who is
-    //sending requests to our api just by the JWT token
+    public String generateVerificationToken(AppUser user) {
+        return JWT.create()
+                .withClaim(EMAIL_KEY, user.getEmail())
+                .withExpiresAt(new Date(System.currentTimeMillis()  + (1000 + expiryInSeconds) ))
+                .withIssuer(issuer)
+                .sign(algorithm);
+    }
 
     public String findUsername(String token) {
         return JWT.decode(token).getClaim(USERNAME_KEY).asString();
