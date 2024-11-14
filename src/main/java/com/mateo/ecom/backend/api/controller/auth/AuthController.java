@@ -1,6 +1,8 @@
 package com.mateo.ecom.backend.api.controller.auth;
 
+import com.mateo.ecom.backend.api.exceptions.EmailFailureException;
 import com.mateo.ecom.backend.api.exceptions.UserAlreadyExists;
+import com.mateo.ecom.backend.api.exceptions.UserNotVerifiedException;
 import com.mateo.ecom.backend.api.model.LoginBody;
 import com.mateo.ecom.backend.api.model.LoginResponse;
 import com.mateo.ecom.backend.api.model.RegistrationBody;
@@ -28,14 +30,14 @@ public class AuthController {
         try {
             userService.user(body);
             return ResponseEntity.ok().build();
-        } catch (UserAlreadyExists ex) {
+        } catch (UserAlreadyExists | EmailFailureException ex) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> loginUser(@Valid @RequestBody LoginBody body) {
-        String jwt = userService.logInUser(body);
+    public ResponseEntity<LoginResponse> loginUser(@Valid @RequestBody LoginBody body) throws UserNotVerifiedException, EmailFailureException {
+        String jwt = userService.loginUser(body);
             if (jwt == null){
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }else {
@@ -53,6 +55,15 @@ public class AuthController {
     @GetMapping("/me")
     public AppUser getCurrentUser(@AuthenticationPrincipal AppUser user) {
         return user;
+    }
+
+    @PostMapping("/verify")
+    public ResponseEntity verifyEmail(@RequestParam String token){
+        if (userService.verifyUser(token)) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
     }
 
 }

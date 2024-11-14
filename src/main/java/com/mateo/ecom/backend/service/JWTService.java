@@ -23,6 +23,7 @@ public class JWTService {
     private Algorithm algorithm;
 
     public static final String USERNAME_KEY = "USERNAME";
+    public static final String EMAIL_KEY = "EMAIL";
 
     @PostConstruct
     public void init() {
@@ -32,6 +33,15 @@ public class JWTService {
     public String createToken(AppUser user) {
         return JWT.create()
                 .withClaim(USERNAME_KEY, user.getUsername())
+                .withExpiresAt(new Date(System.currentTimeMillis()  + (1000 + expiryInSeconds) ))
+                .withIssuer(issuer)
+                .sign(algorithm);
+    }
+
+    //this will generate a JWT where it only has a claim over the email
+    public String createVerificationToken(AppUser user) {
+        return JWT.create()
+                .withClaim(EMAIL_KEY, user.getEmail())
                 .withExpiresAt(new Date(System.currentTimeMillis()  + (1000 + expiryInSeconds) ))
                 .withIssuer(issuer)
                 .sign(algorithm);
