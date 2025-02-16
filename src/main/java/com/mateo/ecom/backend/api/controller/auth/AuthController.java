@@ -30,8 +30,12 @@ public class AuthController {
         try {
             userService.user(body);
             return ResponseEntity.ok().build();
-        } catch (UserAlreadyExists | EmailFailureException ex) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        } catch (UserAlreadyExists ex) {
+            System.out.println("User registration failed - user already exists");
+            System.out.println("Attempted registration with username: " + body.getUsername() + ", email: " + body.getEmail());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("User with this username or email already exists");
+        } catch (EmailFailureException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email verification failed");
         }
     }
 
@@ -53,8 +57,11 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public AppUser getCurrentUser(@AuthenticationPrincipal AppUser user) {
-        return user;
+    public ResponseEntity<AppUser> getCurrentUser(@AuthenticationPrincipal AppUser user) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping("/verify")

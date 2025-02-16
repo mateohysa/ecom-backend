@@ -35,8 +35,8 @@ public class EmailService{
         public void sendVerificationEmail(VerificationToken verificationToken) throws EmailFailureException {
             SimpleMailMessage message = makeMailMessage();
             message.setTo(verificationToken.getUser().getEmail());
-            message.setSubject("Verify your email to active your account.");
-            message.setText("Please follow the link below to verify your email to active your account.\n" +
+            message.setSubject("Verify your email to activate your account.");
+            message.setText("Please follow the link below to verify your email to activate your account.\n" +
                     url + "/auth/verify?token=" + verificationToken.getToken());
             try {
                 javaMailSender.send(message);

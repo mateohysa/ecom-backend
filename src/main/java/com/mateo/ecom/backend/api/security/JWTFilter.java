@@ -41,7 +41,7 @@ public class JWTFilter extends OncePerRequestFilter {
                 //we try to decode the token and get the username
                 String username = jwtService.findUsername(token);
                 //take the username and try to find the user in the DB
-                Optional<AppUser> optUser = UserRepository.findByUsernameLikeIgnoreCase(username);
+                Optional<AppUser> optUser = UserRepository.findByUsernameIgnoreCase(username);
                 if (optUser.isPresent()) {
                     AppUser appUser = optUser.get();
                     //if the user is present we build up the authenticaion object of the user

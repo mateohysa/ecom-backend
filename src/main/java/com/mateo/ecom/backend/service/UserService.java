@@ -37,8 +37,13 @@ public class UserService {
     }
 
     public AppUser user(RegistrationBody registrationBody) throws UserAlreadyExists, EmailFailureException {
-        if (userRepository.findByEmailIgnoreCase(registrationBody.getEmail()).isPresent()
-                || userRepository.findByUsernameLikeIgnoreCase(registrationBody.getUsername()).isPresent()) {
+        Optional<AppUser> existingEmail = userRepository.findByEmailIgnoreCase(registrationBody.getEmail());
+        Optional<AppUser> existingUsername = userRepository.findByUsernameIgnoreCase(registrationBody.getUsername());
+        
+        System.out.println("Checking email: " + registrationBody.getEmail() + ", exists: " + existingEmail.isPresent());
+        System.out.println("Checking username: " + registrationBody.getUsername() + ", exists: " + existingUsername.isPresent());
+        
+        if (existingEmail.isPresent() || existingUsername.isPresent()) {
             throw new UserAlreadyExists();
         }
         AppUser user = new AppUser();
@@ -65,12 +70,12 @@ public class UserService {
 
     }*/
     public String loginUser(LoginBody loginBody) throws UserNotVerifiedException, EmailFailureException {
-        Optional<AppUser> opUser = userRepository.findByUsernameLikeIgnoreCase(loginBody.getUsername());
+        Optional<AppUser> opUser = userRepository.findByUsernameIgnoreCase(loginBody.getUsername());
         if (opUser.isPresent()) {
             AppUser user = opUser.get();
             if (encryptionService.checkPassword(loginBody.getPassword(), user.getPassword())) {
                 if (user.getEmailVerified()) {
-                    return jwtService.createVerificationToken(user);
+                    return jwtService.createToken(user);
                 } else {
                     List<VerificationToken> verificationTokens = user.getVerificationTokens();
                     boolean resend = verificationTokens.isEmpty() ||
