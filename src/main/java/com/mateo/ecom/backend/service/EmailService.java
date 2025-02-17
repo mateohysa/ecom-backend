@@ -1,6 +1,7 @@
 package com.mateo.ecom.backend.service;
 
 import com.mateo.ecom.backend.api.exceptions.EmailFailureException;
+import com.mateo.ecom.backend.models.AppUser;
 import com.mateo.ecom.backend.models.VerificationToken;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -44,5 +45,18 @@ public class EmailService{
                 throw new EmailFailureException();
             }
         }
+
+    public void sendPasswordResetEmail(AppUser appUser, String token) throws EmailFailureException {
+        SimpleMailMessage message = makeMailMessage();
+        message.setTo(appUser.getEmail());
+        message.setSubject("Password Reset.");
+        message.setText("Please follow the link below to reset the password for your account.\n" +
+                url + "/auth/reset?token=" + token);
+        try {
+            javaMailSender.send(message);
+        } catch (MailException ex) {
+            throw new EmailFailureException();
+        }
+    }
 
     }

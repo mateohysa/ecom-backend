@@ -24,7 +24,9 @@ public class JWTService {
     private Algorithm algorithm;
 
     public static final String USERNAME_KEY = "USERNAME";
-    public static final String EMAIL_KEY = "EMAIL";
+    public static final String VERIFY_EMAIL_KEY = "VERIFY_EMAIL";
+    public static final String RESET_PASSWORD_EMAIL_KEY = "RESET_PASSWORD_EMAIL";
+
 
     @PostConstruct
     public void init() {
@@ -42,10 +44,21 @@ public class JWTService {
     //this will generate a JWT where it only has a claim over the email
     public String createVerificationToken(AppUser user) {
         return JWT.create()
-                .withClaim(EMAIL_KEY, user.getEmail())
+                .withClaim(VERIFY_EMAIL_KEY, user.getEmail())
                 .withExpiresAt(new Date(System.currentTimeMillis()  + (1000 + expiryInSeconds) ))
                 .withIssuer(issuer)
                 .sign(algorithm);
+    }
+    public String passwordResetVerificationToken(AppUser user) {
+        return JWT.create()
+                .withClaim(RESET_PASSWORD_EMAIL_KEY, user.getEmail())
+                .withExpiresAt(new Date(System.currentTimeMillis()  + (1000 + expiryInSeconds) ))
+                .withIssuer(issuer)
+                .sign(algorithm);
+    }
+    public String findPasswordResetEmail(String token) {
+        DecodedJWT jwt = JWT.require(algorithm).build().verify(token);
+        return jwt.getClaim(RESET_PASSWORD_EMAIL_KEY).asString();
     }
 
     //since we used .withclaim username_key in the method above

@@ -58,9 +58,9 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         // CORS Configuration
         CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.addAllowedOrigin("http://localhost:8080"); // Allows requests from localhost:8080
-        corsConfig.addAllowedMethod("*");                     // Allows all HTTP methods
-        corsConfig.addAllowedHeader("*");                     // Allows all headers
+        corsConfig.addAllowedOrigin("http://localhost:8080");
+        corsConfig.addAllowedMethod("*");
+        corsConfig.addAllowedHeader("*");
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfig);
@@ -69,7 +69,7 @@ public class WebSecurityConfig {
                 .csrf(csrf -> csrf.disable())                     // Disable CSRF for testing or specific needs
                 .cors(cors -> cors.configurationSource(source))   // Apply CORS configuration
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/product", "/auth/register", "/auth/login", "/auth/verify").permitAll() // Allow access to these endpoints
+                        .requestMatchers("/product", "/auth/register","/auth/forgot", "/auth/reset", "/auth/login", "/auth/verify").permitAll() // Allow access to these endpoints
                         .anyRequest().authenticated()                 // Require authentication for all other endpoints
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // Place jwtFilter before UsernamePasswordAuthenticationFilter

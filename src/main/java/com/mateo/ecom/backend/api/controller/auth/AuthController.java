@@ -1,10 +1,12 @@
 package com.mateo.ecom.backend.api.controller.auth;
 
 import com.mateo.ecom.backend.api.exceptions.EmailFailureException;
+import com.mateo.ecom.backend.api.exceptions.EmailNotFoundException;
 import com.mateo.ecom.backend.api.exceptions.UserAlreadyExists;
 import com.mateo.ecom.backend.api.exceptions.UserNotVerifiedException;
 import com.mateo.ecom.backend.api.model.LoginBody;
 import com.mateo.ecom.backend.api.model.LoginResponse;
+import com.mateo.ecom.backend.api.model.PasswordResetBody;
 import com.mateo.ecom.backend.api.model.RegistrationBody;
 import com.mateo.ecom.backend.models.AppUser;
 import com.mateo.ecom.backend.service.UserService;
@@ -71,6 +73,23 @@ public class AuthController {
         } else {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
+    }
+    @PostMapping("/forgot")
+    public ResponseEntity forgotPassword(@RequestParam String email) throws EmailNotFoundException, EmailFailureException {
+        try {
+            userService.forgotPassword(email);
+            return ResponseEntity.ok().build();
+        } catch (EmailNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();  //always return response entities here and not just exceptions, we need the correct error code from the API
+        } catch (EmailFailureException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/reset")
+    public ResponseEntity resetPassword(@Valid @RequestBody PasswordResetBody body){
+        userService.resetPassword(body);
+        return ResponseEntity.ok().build();
     }
 
 }

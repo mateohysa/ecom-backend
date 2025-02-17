@@ -1,9 +1,11 @@
 package com.mateo.ecom.backend.service;
 
 import com.mateo.ecom.backend.api.exceptions.EmailFailureException;
+import com.mateo.ecom.backend.api.exceptions.EmailNotFoundException;
 import com.mateo.ecom.backend.api.exceptions.UserAlreadyExists;
 import com.mateo.ecom.backend.api.exceptions.UserNotVerifiedException;
 import com.mateo.ecom.backend.api.model.LoginBody;
+import com.mateo.ecom.backend.api.model.PasswordResetBody;
 import com.mateo.ecom.backend.api.model.RegistrationBody;
 import com.mateo.ecom.backend.models.AppUser;
 import com.mateo.ecom.backend.models.VerificationToken;
@@ -114,5 +116,26 @@ public class UserService {
             }
         }
         return false;
+    }
+
+    public void forgotPassword (String email) throws EmailNotFoundException, EmailFailureException {
+        Optional<AppUser> opUser = userRepository.findByEmailIgnoreCase(email);
+        if (opUser.isPresent()) {
+            AppUser user = opUser.get();
+            String token = jwtService.passwordResetVerificationToken(user);
+            emailService.sendPasswordResetEmail(user,token);
+        }else {
+            throw new EmailNotFoundException();
+        }
+    }
+    public void resetPassword(PasswordResetBody body){
+        // get the email from the decoded JWT that we use just for resetting the password
+        String email = jwtService.findPasswordResetEmail(body.getToken());
+        Optional<AppUser> opUser = userRepository.findByEmailIgnoreCase(email);
+        if (opUser.isPresent()) {
+            AppUser user = opUser.get();
+            user.setPassword(encryptionService.encrypt(body.getPassword()));
+            userRepository.save(user);
+        }
     }
 }
