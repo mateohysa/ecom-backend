@@ -75,4 +75,4 @@ A robust e-commerce backend system built with Spring Boot, providing secure user
 
 2. Clone the repository:
 ```bash
-git clone [repository-url]
+git clone [https://github.com/mateohysa/ecom-backend.git]
